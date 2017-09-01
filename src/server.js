@@ -13,7 +13,10 @@ const server = express();
 // to enable parsing of json bodies for post requests
 server.use(bodyParser.json());
 server.use(session({
-  secret: 'e5SPiqsEtjexkTj3Xqovsjzq8ovjfgVDFMfUzSmJO21dtXs4re'
+  secret: 'e5SPiqsEtjexkTj3Xqovsjzq8ovjfgVDFMfUzSmJO21dtXs4re',
+  resave: false,
+  saveUninitialized: true,
+  cooke: { secure: false }
 }));
 server.use(cors());
 /* Sends the given err, a string or an object, to the client. Sets the status
@@ -59,8 +62,14 @@ const validation = (req, res, next) => {
   });
 };
 
-server.get('/restricted/something', (req, res) => {
-  res.json({ success: 'you have restricted access' });
+server.get('/restricted/users', (req, res) => {
+  User.find({}, (err, users) => {
+    if (err) {
+      sendUserError(err, res);
+      return;
+    }
+    res.json(users);
+  });
 });
 
 server.post('/users', (req, res) => {
